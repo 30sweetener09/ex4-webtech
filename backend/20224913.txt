@@ -1,0 +1,32 @@
+//backend
+1. Kiểm tra xem có bị tùng email không:
+ở api.post có thêm biến:
+    const existingUser = await User.findOne({ email: email });
+    if (existingUser) {
+        return res.status(400).json({
+            error: "Email đã tồn tại trong database"
+        });
+    }
+
+2.Sử dụng Promise.all cho truy vấn song song phần Get (find và countDocument)
+const [users, total] = await Promise.all([
+    User.find(filter).skip(skip).limit(limit),
+    User.countDocuments(filter)
+]);
+
+//frontend
+1. Số thứ tự tăng theo page, thay vì bắt đầu lại ở mỗi page:
+- Thay đổi props ở UserTable, thêm page và limit rồi để tính toán stt theo user._id, page, limit
+function UserTable({ users, page, limit, onEdit, onDelete })
+...
+users.map((user, index) => (
+    <tr key={user._id}>
+        <td>{(page - 1) * limit + index + 1}</td>
+        ...)
+)
+
+2. Reset page về 1 khi limit thay đổi
+- Thêm ở component App: chuyển về page 1 mỗi khi limit thay đổi
+React.useEffect(() => {
+    setPage(1);
+}, [limit]);
